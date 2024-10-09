@@ -1,0 +1,13 @@
+
+- export PATH="/Users/vohoangtuit/DATA/DEVELOP/AndroidStudio/flutter_sdk/flutter/bin:$PATH" // change path
+- export PATH="/Users/admin/VO_HOANG_TU/dev/AndroidStudio/sdk/flutter/bin:$PATH"
+- flutter pub run build_runner build // todo api
+- flutter packages pub run build_runner build // todo floor db
+
+todo update file pub
+> flutter clean
+> flutter pub get
+> cd ios
+> pod update || pod install // todo if error run:  'pod deintegrate' before
+
+/// flutter run --release
