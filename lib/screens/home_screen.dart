@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/google_generate/google_generate_service.dart';
 import 'package:flutter_gemini/models/message.dart';
 import 'package:flutter_gemini/screens/items/item_message.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_gemini/utils/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,17 +14,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _messageController =TextEditingController();
-  /// api key: AIzaSyCbtkkiR3iwR2cP3N6uN8yjooRO8Bj_9r8
-  /// project number: 437455981233
-  final model = GenerativeModel(
-    model: 'gemini-1.5-flash-latest',
-    apiKey: 'AIzaSyCbtkkiR3iwR2cP3N6uN8yjooRO8Bj_9r8',
-  );
+ // var model = GenerativeModel(
+ //  model: 'gemini-1.5-flash-latest',
+ //  apiKey: 'AIzaSyCk-imcydUb1AFL9HpWJhzX-9_jfCfbhEs',
+ //  );
+   var service =GoogleGenerateService.instance..getInstance();
 
   List<Message> data=[];
   double screenWidth =0;
-   var _scrollController = ScrollController();
-
+   final _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -38,6 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _viewContent(),
     );
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+
   Widget _viewContent(){
     return    GestureDetector(
       onTap: () {
@@ -86,9 +93,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               IconButton(
+                onPressed: _getImage,
+                icon: const Icon(
+                  Icons.image_outlined,
+                  color: Colors.grey,
+                ),
+              ),
+              IconButton(
                 onPressed: _sendMessage,
                 icon: const Icon(
                   Icons.send,
+                  color: Colors.blue,
                 ),
               ),
             ],
@@ -98,15 +113,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+  Future _getImage()async{
+    final pickedImage = await pickImage();
+    if (pickedImage == null) {
+      return;
+    }
+    _sendMessageImage(pickedImage);
+  }
+  /// --- text
   Future _sendMessage() async {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
     _updateList(_messageController.text,true);
     _messageController.clear();
-    final content = [Content.text(message)];
-    final response = await model.generateContent(content);
-    _updateList(response.text!,false);
-   // print(response.text);
+
+    final response= await service.sendTextMessage(message);
+
+    _updateList(response,false);
+
     
   }
   _updateList(String text, bool send){
@@ -115,6 +139,24 @@ class _HomeScreenState extends State<HomeScreen> {
         data.add(Message.newMessage(message: text,send: send));
       });
       _scrollToBottom();
+    }
+  }
+  ///----- image
+  Future _sendMessageImage(XFile file)async{
+    _updateListWithImage(file.path,true);
+    // final imageBytes = await file.readAsBytes();
+    // final mimeType = file.mimeType;
+    // final imagePart = DataPart(mimeType.toString(), imageBytes);
+    // final content = [Content.data('please description this image',imagePart.bytes)];
+ //   final response = await model.generateContent(content);
+    final response= await service.sendImageMessage(file);
+    _updateList(response,false);
+  }
+  _updateListWithImage(String path,bool send){
+    if(mounted){
+      setState(() {
+        data.add(Message.newMessageImage(path: path,send: send));
+      });
     }
   }
   _scrollToBottom(){

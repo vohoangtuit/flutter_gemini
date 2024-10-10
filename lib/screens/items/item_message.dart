@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/utils/format_datetime.dart';
 
@@ -19,12 +21,7 @@ class _ItemMessageState extends State<ItemMessage> {
     return _itemBuilder(widget.item);
   }
   Widget _itemBuilder(Message item){
-    return Stack(
-      children: [
-        item.isSend!?_itemRequest(item):_itemResponse(item)
-      ],
-    );
-    // return item.isSend!?_itemRequest(item):_itemResponse(item);
+    return item.isSend!?_itemRequest(item):_itemResponse(item);
   }
   Widget _itemRequest(Message item){
     return Row(
@@ -43,17 +40,23 @@ class _ItemMessageState extends State<ItemMessage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Flexible(
-                    child: Container(
+                    child: item.type==TypeMessage.text?Container(
                         decoration: bgItem(Colors.orangeAccent.shade100),
                         padding: EdgeInsets.all(10),
-                        child: Text(item.text!)),
-                  ),
+                        child: Text(item.text!),
+                  ):_typeImage(item),)
                 ],
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+  Widget _typeImage(Message item){
+    return Image.file(
+      File(item.pathLocalImage!),
+      fit: BoxFit.cover,
     );
   }
   Widget _itemResponse(Message item){
