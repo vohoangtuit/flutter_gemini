@@ -43,7 +43,7 @@ class _ItemMessageState extends State<ItemMessage> {
                     child: item.type==TypeMessage.text?Container(
                         decoration: bgItem(Colors.orangeAccent.shade100),
                         padding: EdgeInsets.all(10),
-                        child: Text(item.text!),
+                        child: Text(item.text!.trimRight()),
                   ):_typeImage(item),)
                 ],
               ),
@@ -60,23 +60,27 @@ class _ItemMessageState extends State<ItemMessage> {
     );
   }
   Widget _itemResponse(Message item){
-    return  Container(
+    return  Row(
+      children: [
+        Container(
         width: widget.screenWidth/div,
-        margin: EdgeInsets.only(top: 5,bottom: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: _time(item.dateTime!,false),
-            ),
-            Container(
-                padding: EdgeInsets.all(10),
-                decoration: bgItem(Colors.blueGrey.shade300),
-                child: Text(item.text!,)
-            ),
-          ],
-        ));
+            margin: EdgeInsets.only(top: 5,bottom: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: _time(item.dateTime!,false),
+                ),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: bgItem(Colors.blueGrey.shade300),
+                    child: Text(item.text!.trimRight(),)
+                ),
+              ],
+            )),
+      ],
+    );
   }
   BoxDecoration bgItem(Color color) {
     return BoxDecoration(
