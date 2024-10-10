@@ -14,10 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _messageController =TextEditingController();
- // var model = GenerativeModel(
- //  model: 'gemini-1.5-flash-latest',
- //  apiKey: 'AIzaSyCk-imcydUb1AFL9HpWJhzX-9_jfCfbhEs',
- //  );
+
    var service =GoogleGenerateService.instance..getInstance();
 
   List<Message> data=[];
@@ -100,6 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               IconButton(
+                onPressed: _takeCamara,
+                icon: const Icon(
+                  Icons.photo_camera_rounded,
+                  color: Colors.grey,
+                ),
+              ),
+              IconButton(
                 onPressed: _sendMessage,
                 icon: const Icon(
                   Icons.send,
@@ -119,6 +123,14 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     _sendMessageImage(pickedImage);
+  }
+  Future _takeCamara()async{
+    final pickedImage = await takeCamera();
+    if (pickedImage == null) {
+      return;
+    }
+    _sendMessageImage(pickedImage);
+
   }
   /// --- text
   Future _sendMessage() async {
@@ -144,11 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
   ///----- image
   Future _sendMessageImage(XFile file)async{
     _updateListWithImage(file.path,true);
-    // final imageBytes = await file.readAsBytes();
-    // final mimeType = file.mimeType;
-    // final imagePart = DataPart(mimeType.toString(), imageBytes);
-    // final content = [Content.data('please description this image',imagePart.bytes)];
- //   final response = await model.generateContent(content);
     final response= await service.sendImageMessage(file);
     _updateList(response,false);
   }
